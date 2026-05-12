@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+import { readFile, writeFile, rename } from 'node:fs/promises';
+import process from 'node:process';
+
+async function main() {
+  const version = JSON.parse(await readFile('./package.json', { encoding: 'utf8' })).version;
+  const changesFile = 'CHANGELOG.md';
+  const changes = await readFile(changesFile, { encoding: 'utf8' });
+  const unreleasedRx = /^## Unreleased\n/m;
+  if (!changes.match(unreleasedRx)) {
+    console.error("Unable to find Unreleased section!");
+    process.exit(1);
+  }
+  if (changes.match(new RegExp(`^## ${version.replace('.', '\\.')} `, 'm'))) {
+    console.error(`${version} section already exists!`);
+    process.exit(1);
+  }
+  const date = new Date();
+  const dateString = [date.getUTCFullYear(), date.getUTCMonth()+1, date.getUTCDate()].map(d => d.toString().padStart(2, '0')).join('-');
+  const newChanges = changes.replace(/^## Unreleased\n/m, `## ${version} (${dateString})\n`);
+  const newFile = `CHANGELOG.md.${process.pid}`;
+  await writeFile(newFile, newChanges, { encoding: 'utf8' });
+  await rename(newFile, changesFile);
+}
+
+main();

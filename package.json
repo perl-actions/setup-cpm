@@ -1,0 +1,44 @@
+{
+  "name": "setup-cpm",
+  "version": "1.0.0",
+  "description": "Setup cpm",
+  "main": "src/main.mjs",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "mocha",
+    "build": "node ./build-release.mjs",
+    "preversion": "npm test && npm run lint",
+    "version": "npm run build && node ./prep-changelog && git add -A dist CHANGELOG.md",
+    "postversion": "git push origin HEAD && git push origin v$(npm pkg get version --workspaces=false | tr -d \\\")"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/perl-actions/setup-cpm.git"
+  },
+  "keywords": [],
+  "author": "Graham Knop <haarg@haarg.org>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/perl-actions/setup-cpm/issues"
+  },
+  "homepage": "https://github.com/perl-actions/setup-cpm#readme",
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/tool-cache": "^4.0.0",
+    "octokit": "^5.0.5",
+    "semver": "^7.8.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "chai": "^6.2.2",
+    "esbuild": "^0.28.0",
+    "eslint": "^10.3.0",
+    "eslint-plugin-mocha": "^11.2.0",
+    "esmock": "^2.7.5",
+    "globals": "^17.6.0",
+    "mocha": "^v12.0.0-beta-9.3"
+  }
+}

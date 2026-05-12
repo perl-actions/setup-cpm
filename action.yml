@@ -1,0 +1,19 @@
+name: 'Setup cpm installer'
+description: 'Setup cpm installer for CPAN modules.'
+branding:
+  icon: 'download'
+  color: 'blue'
+
+inputs:
+  token:
+    description: 'GitHub token to for querying API'
+    default: ${{ github.token }}
+    required: false
+  version:
+    description: 'The version of cpm to install'
+    required: false
+    default: '*'
+
+runs:
+  using: 'node24'
+  main: 'dist/action.mjs'
