@@ -4,6 +4,11 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Octokit } from 'octokit';
 import { getVersionRef } from './get-version-ref.mjs';
+import {
+  fakeCartonSnapshot,
+  batchFile,
+  cpmScript,
+} from './extra-files.mjs';
 
 export const run = async () => {
   const versionInput = core.getInput('version');
@@ -47,16 +52,28 @@ export const run = async () => {
   if (!cpmDir) {
     const url = `https://raw.githubusercontent.com/${owner}/${repo}/${versionRef}/cpm`;
     const cpmDownload = await tc.downloadTool(url);
-    cpmDir = await tc.cacheFile(cpmDownload, 'cpm', name, versionRef);
-    await fs.chmod(path.join(cpmDir, 'cpm'), 0o755);
-    const batchFile = `
-        @setlocal EnableExtensions
-        @set "ERRORLEVEL="
-        @perl "%~dp0cpm" %* || goto :error
-        :error
-        @"%COMSPEC%" /d/c "@exit %ERRORLEVEL%"
-    `.replace(/^\s*/gm, '');
-    await fs.writeFile(path.join(cpmDir, 'cpm.bat'), batchFile);
+
+    await using tempDir = await fs.mkdtempDisposable('setup-cpm-');
+
+    const scriptDir = path.join(tempDir.path, 'script');
+    await fs.mkdir(scriptDir);
+
+    await fs.copyFile(cpmDownload, path.join(scriptDir, 'cpm'));
+
+    const libDir = path.join(tempDir.path, 'lib');
+    await fs.mkdir(libDir);
+
+    const cartonSnapshotPath = path.join(libDir, 'CartonSnapshotTiny.pm');
+    await fs.writeFile(cartonSnapshotPath, fakeCartonSnapshot);
+
+    const cpmPath = path.join(tempDir.path, 'cpm');
+    await fs.writeFile(cpmPath, cpmScript);
+    await fs.chmod(cpmPath, 0o755);
+
+    const batchPath = path.join(tempDir.path, 'cpm.bat');
+    await fs.writeFile(batchPath, batchFile);
+
+    cpmDir = await tc.cacheDir(tempDir.path, name, versionRef);
   }
 
   core.addPath(cpmDir);

@@ -55,6 +55,8 @@ describe('GitHub action', function () {
     expect(files).to.be.deep.equal([
       'cpm',
       'cpm.bat',
+      'lib/CartonSnapshotTiny.pm',
+      'script/cpm',
     ]);
   });
 
@@ -68,6 +70,8 @@ describe('GitHub action', function () {
     expect(files).to.be.deep.equal([
       'cpm',
       'cpm.bat',
+      'lib/CartonSnapshotTiny.pm',
+      'script/cpm',
     ]);
   });
 });

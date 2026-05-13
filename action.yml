@@ -1,5 +1,5 @@
 name: 'Setup cpm installer'
-description: 'Setup cpm installer for CPAN modules.'
+description: 'Setup cpm installer for CPAN modules, including carton.snapshot support.'
 branding:
   icon: 'download'
   color: 'blue'

@@ -1,7 +1,7 @@
 # setup-cpm
 
 GitHub action to setup cpm for later module installation. Uses the single file
-version of cpm.
+version of cpm, including support for cpanfile.snapshot.
 
 # Usage
 ```yaml
