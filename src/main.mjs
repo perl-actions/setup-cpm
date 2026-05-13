@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
 import * as path from 'path';
 import * as fs from 'fs/promises';
@@ -9,6 +10,23 @@ import {
   batchFile,
   cpmScript,
 } from './extra-files.mjs';
+
+export const getPerlVersion = async () => {
+  let stdout = '';
+  await exec.exec('perl', ['-e', 'print 0+$]'], {
+    listeners: {
+      stdout: (data) => {
+        stdout += data.toString();
+      },
+    },
+    silent: true,
+  });
+  const version = parseFloat(stdout);
+  if (Number.isNaN(version)) {
+    throw new Error(`Unable to parse version number "${stdout}"`);
+  }
+  return version;
+};
 
 export const run = async () => {
   const versionInput = core.getInput('version');
@@ -26,7 +44,16 @@ export const run = async () => {
   }
   const octokit = new Octokit(octoConfig);
 
-  const wantVersion = versionInput.trim();
+  let wantVersion = versionInput.trim();
+
+  if (wantVersion == 'compat') {
+    if (getPerlVersion() < 5.024) {
+      wantVersion = '0.998003';
+    }
+    else {
+      wantVersion = '*';
+    }
+  }
 
   const versionRef = await getVersionRef({
     octokit,

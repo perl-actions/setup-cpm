@@ -12,7 +12,10 @@ version of cpm, including support for cpanfile.snapshot.
     # specified as a version range following modified semver rules. It will
     # accept semver rule specifiers but also interpret perl numeric style
     # versions.
-    # Defaults to `*`, which will be the latest release.
+    # A special value, `compat` can be used. This will use an older release
+    # (0.998003) if the detected perl version is to old to support modern
+    # releases. For newer perl versions, it will install the latest version.
+    # Defaults to `compat`.
     version: ''
 
     # A GitHub token to query tags and commits. Does not need any configured

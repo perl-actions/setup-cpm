@@ -12,7 +12,7 @@ inputs:
   version:
     description: 'The version of cpm to install'
     required: false
-    default: '*'
+    default: 'compat'
 
 runs:
   using: 'node24'
